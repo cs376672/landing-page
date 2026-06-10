@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정지우 프로필 링크</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-effects">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <main class="container">
+        <!-- 프로필 헤더 영역 -->
+        <header class="profile-header">
+            <div class="profile-img-container">
+                <img id="profile-img" src="profile_pic.png" alt="Profile Picture" class="profile-img skeleton-img">
+            </div>
+            <h1 id="hero-title" class="skeleton-text">안녕하세요...</h1>
+            <p id="profile-desc" class="profile-desc skeleton-text">자기소개 로딩중...</p>
+        </header>
+
+        <!-- 멀티 링크 영역 -->
+        <section class="links-section" id="links-container">
+            <!-- 자바스크립트를 통해 동적으로 렌더링 됩니다 -->
+            <div class="link-item skeleton-block"></div>
+            <div class="link-item skeleton-block"></div>
+            <div class="link-item skeleton-block"></div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
