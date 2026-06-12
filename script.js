@@ -1,4 +1,4 @@
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyCLgYWT-uW2R93EcFO0hd95xZFHpH2y2_Q2yo07S3Ug_KDhjHBPvxGi8nY0j4-4jNYdA/exec';
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCLgYWT-uW2R93EcFO0hd95xZFHpH2y2_Q2yo07S3Ug_KDhjHBPvxGi8nY0j4-4jNYdA/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.querySelector('.container');
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
             applyDataToDOM(data);
         })
         .catch(err => {
-            console.error('Error fetching sheet data:', err);
+            console.error('데이터 불러오기 실패:', err);
         })
         .finally(() => {
             setTimeout(() => {
@@ -21,14 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 });
 
-async function fetchSheetData() {
-    const response = await fetch(WEB_APP_URL);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    
-    const parsedData = await response.json();
-    return parsedData;
+function fetchSheetData() {
+    return fetch(GOOGLE_APP_SCRIPT_URL)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        });
 }
 
 function applyDataToDOM(data) {
