@@ -1,4 +1,4 @@
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCLgYWT-uW2R93EcFO0hd95xZFHpH2y2_Q2yo07S3Ug_KDhjHBPvxGi8nY0j4-4jNYdA/exec';
+const GVIZ_URL = 'https://docs.google.com/spreadsheets/d/1H1jNQYD59Ksr1ter56N_TXRznNHfWAJWaPVRSNS-s7Y/gviz/tq?tq=&tqx=out:json';
 
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.querySelector('.container');
@@ -22,12 +22,52 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchSheetData() {
-    return fetch(GOOGLE_APP_SCRIPT_URL)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+    return fetch(GVIZ_URL)
+        .then(response => response.text())
+        .then(text => {
+            // Google gviz API 응답에서 순수 JSON 부분만 추출
+            const jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+            const data = JSON.parse(jsonStr);
+            
+            const rows = data.table.rows;
+            let parsedData = {
+                links: []
+            };
+            
+            // 데이터가 세로가 아닌 가로(열 단위)로 입력된 형태를 파싱
+            if (rows && rows.length >= 3) {
+                const numCols = rows[0].c.length;
+                for(let i=1; i<numCols; i++) {
+                    const type = rows[0].c[i] ? rows[0].c[i].v : null;
+                    const title = rows[1].c[i] ? rows[1].c[i].v : null;
+                    const value = rows[2].c[i] ? rows[2].c[i].v : null;
+                    const bgColor = (rows[3] && rows[3].c[i]) ? rows[3].c[i].v : null;
+                    const textColor = (rows[4] && rows[4].c[i]) ? rows[4].c[i].v : null;
+                    
+                    if(type === 'profile') {
+                        if(title === 'hero_title') parsedData.hero_title = value;
+                        if(title === 'profile_desc') parsedData.profile_desc = value;
+                        if(title === 'profile_img_url') parsedData.profile_img_url = value;
+                    } else if(type === 'link') {
+                        parsedData.links.push({
+                            title: title,
+                            url: value,
+                            bg_color: bgColor,
+                            text_color: textColor
+                        });
+                    }
+                }
             }
-            return response.json();
+            
+            // 누락된 프로필 이미지가 있을 경우 기본값 세팅
+            if (!parsedData.profile_img_url) {
+                parsedData.profile_img_url = "https://github.com/cs376672.png";
+            }
+            if (!parsedData.profile_desc) {
+                parsedData.profile_desc = "새로운 기술로 일상을 더 편리하게 만드는 데 관심이 많아요. 현재 안티그래비티 AI와 함께 웹 페이지 구현을 기획하고 테스트하고 있습니다. 소통 환영해요!";
+            }
+            
+            return parsedData;
         });
 }
 
@@ -45,7 +85,10 @@ function applyDataToDOM(data) {
         data.links.forEach(link => {
             const a = document.createElement('a');
             a.href = link.url;
-            a.target = "_blank";
+            // 전화걸기나 이메일 등 외부 링크에 대한 _blank 설정
+            if (!link.url.startsWith('tel:') && !link.url.startsWith('mailto:')) {
+                a.target = "_blank";
+            }
             a.className = "link-button";
             a.innerText = link.title;
             
